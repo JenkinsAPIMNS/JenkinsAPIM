@@ -1,0 +1,204 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "API Management facade voor prijsinformatie van specifieke reizen en/of producten",
+    "version": "1.4",
+    "title": "Prijsinformatie API",
+    "termsOfService": "http://www.ns.nl/",
+    "contact": {
+      "name": "NS",
+      "url": "http://www.ns.nl/",
+      "email": "ns@ns.nl"
+    },
+    "license": {
+      "name": "Uitsluitend te gebruiken na schriftelijke goedkeuring van de eigenaar"
+    }
+  },
+  "host": "localhost:8080",
+  "basePath": "/rio-price-api",
+  "tags": [
+    {
+      "name": "supplement-api",
+      "description": "Supplement Api"
+    },
+    {
+      "name": "prices-api",
+      "description": "Prices Api"
+    }
+  ],
+  "paths": {
+    "/prices": {
+      "post": {
+        "tags": [
+          "prices-api"
+        ],
+        "summary": "Geeft de 2e klas vol tarief prijs van de meegestuurde reizen (inclusief toeslagen waar van toepassing)",
+        "operationId": "getPrices",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "trips",
+            "description": "trips",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Trip"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PricesResponse"
+              }
+            }
+          },
+          "201": {
+            "description": "Created"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/supplement": {
+      "get": {
+        "tags": [
+          "supplement-api"
+        ],
+        "summary": "Geeft de prijs van de toeslag voor het reizen met de HSN",
+        "description": "Voorbeeldrequest: /supplement?departureTimestamp=2017-11-22T11%3A37&departureStationCode=shl&arrivalStationCode=rtd&trainNumber=1032",
+        "operationId": "getSupplement",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "*/*"
+        ],
+        "parameters": [
+          {
+            "name": "trainNumber",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "departureStationCode",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "arrivalStationCode",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "departureTimestamp",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/HsnSupplementResponse"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "HsnSupplementResponse": {
+      "type": "object",
+      "properties": {
+        "hsnSupplement": {
+          "type": "number",
+          "format": "double"
+        }
+      }
+    },
+    "Leg": {
+      "type": "object",
+      "properties": {
+        "arrivalStationCode": {
+          "type": "string"
+        },
+        "departureStationCode": {
+          "type": "string"
+        },
+        "departureTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "trainNumber": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "PricesResponse": {
+      "type": "object",
+      "properties": {
+        "price": {
+          "type": "number",
+          "format": "double"
+        },
+        "supplement": {
+          "type": "number",
+          "format": "double"
+        },
+        "supplementTypes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Trip": {
+      "type": "object",
+      "properties": {
+        "legs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Leg"
+          }
+        }
+      }
+    }
+  }
+}
